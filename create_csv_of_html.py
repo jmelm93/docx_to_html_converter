@@ -2,6 +2,7 @@ import pandas as pd
 import glob
 import os 
 
+folder_paths = ['/_data/IDENTIFIER/html']
 
 def consolidateHtmlToCsv(folder_path, brand):
 
@@ -12,9 +13,10 @@ def consolidateHtmlToCsv(folder_path, brand):
         # get text from html file
         with open(folder_path + '/' + file, 'r') as html_file:
             html = html_file.read()
-            filename = file.split('.')[0]
+            filename = file.split('.')[0]            
+            page_id = filename.split('_')[0]
             
-            file_df = pd.DataFrame({'brand': [brand], 'filename': [filename], 'html': [html]})
+            file_df = pd.DataFrame({'brand': [brand], 'filename': [filename], 'page_id': [page_id], 'html': [html]})
             
             # combine with df
             df = pd.concat([df, file_df], axis = 0)
@@ -22,21 +24,18 @@ def consolidateHtmlToCsv(folder_path, brand):
     return df
 
 
-def main():
-    folder_path_chicos = os.getcwd() + '/CHICOS/Html'
-    folder_path_whbm = os.getcwd() + '/WHBM/Html'
-    folder_path_soma = os.getcwd() + '/SOMA/Html'
+def main(folder_paths=folder_paths):
     
-    paths = [folder_path_chicos, folder_path_whbm, folder_path_soma]
+    paths_for_html = []
     
-    df = pd.DataFrame(columns = ['brand', 'filename', 'html'])
+    for path in folder_paths:
+        paths_for_html.append(os.getcwd() + path)
     
-    for path in paths:
-        
+    df = pd.DataFrame(columns = ['brand', 'filename', 'page_id', 'html'])
+    
+    for path in paths_for_html:
         brand = path.split('/')[-2]
-        
         file_df = consolidateHtmlToCsv(path, brand)
-        
         df = pd.concat([df, file_df], axis = 0)
 
     return df
